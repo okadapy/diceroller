@@ -119,7 +119,7 @@ mod tests {
     fn normal_roll_range_test() {
         for sides in 2..=20 {
             for rolls in 1..=10 {
-                for i in 0..=5000 {
+                for _i in 0..=5000 {
                     let dice: Dice = Dice::new(rolls, sides, RollType::Normal);
                     let roll: Roll = dice.roll().into();
                     assert!(
@@ -140,7 +140,7 @@ mod tests {
         for roll_type in roll_types_vec {
             for sides in 2..=20 {
                 for rolls in 1..=10 {
-                    for i in 0..=5000 {
+                    for _i in 0..=5000 {
                         let dice: Dice = Dice::new(rolls, sides, roll_type);
                         let roll: RollAdvantage = dice.roll().into();
                         match roll_type {
