@@ -114,18 +114,4 @@ impl Dice {
     }
 }
 fn main() {
-    for i in vec![RollType::Normal, RollType::Disadvantage, RollType::Advantage] {
-        let dice = Dice::new(1, 20, i);
-        println!("{:?}", i.clone());
-        match i {
-            RollType::Normal => {
-                let result: Roll = dice.roll().into();
-                println!("result: {}", result.value);
-            }
-            _ => {
-                let result: RollAdvantage = dice.roll().into();
-                println!("result: {}, other: {}", result.result.value, result.other.value);
-            }
-        }
-    }
 }
