@@ -1,0 +1,119 @@
+use rand::Rng;
+
+struct Dice {
+    rolls: i32,
+    sides: i32,
+    roll_type: RollType,
+}
+
+impl Dice {
+    fn new(rolls: i32, sides: i32, roll_type: RollType) -> Self {
+        Dice {
+            rolls,
+            sides,
+            roll_type,
+        }
+    }
+
+    fn roll(&self) -> DiceResult {
+        let mut val = 0;
+        let mut val_list: Vec<i32> = vec![];
+        for _ in 1..=self.rolls {
+            let new_al = rand::thread_rng().gen_range(1..=self.sides);
+            val += new_al;
+            val_list.push(new_al);
+        }
+
+        DiceResult {
+            value: val,
+            single_rolls: val_list,
+        }
+    }
+
+    fn roll_advantage(&self, advantage: bool) -> AdvantageResult {
+        let val1 = self.roll();
+        let val2 = self.roll();
+        let mut result: DiceResult;
+        let mut other: DiceResult;
+        if val1.value > val2.value && advantage {
+            result = val1;
+            other = val2;
+        } else if val2.value > val1.value && advantage {
+            result = val2;
+            other = val1;
+        } else if !advantage && val1.value > val2.value {
+            result = val2;
+            other = val1;
+        } else if !advantage && val2.value > val1.value {
+            result = val1;
+            other = val2;
+        } else {
+            result = val2;
+            other = val1;
+        }
+        AdvantageResult { result, other }
+    }
+}
+
+struct AdvantageResult {
+    result: DiceResult,
+    other: DiceResult,
+}
+
+impl AdvantageResult {
+    fn to_string(&self) -> String {
+        let mut buf: String = String::new();
+        for i in self
+            .result
+            .single_rolls
+            .iter()
+            .zip(self.other.single_rolls.iter())
+            .enumerate()
+        {
+            buf.push_str(&format!(
+                "{}: Result: {} Other: {}\n",
+                i.0 + 1,
+                i.1 .0,
+                i.1 .1
+            ));
+        }
+        buf.push_str(&format!(
+            "Result: {}, Other {}",
+            self.result.value, self.other.value
+        ));
+        buf
+    }
+}
+
+struct DiceResult {
+    value: i32,
+    single_rolls: Vec<i32>,
+}
+
+impl DiceResult {
+    fn to_string(&self) -> String {
+        let mut buf = String::new();
+        for i in self.single_rolls.iter().enumerate() {
+            buf.push_str(&format!("{} Dice: {}\n", i.0 + 1, i.1))
+        }
+        buf.push_str(&format!("Result : {}", self.value));
+        return buf;
+    }
+}
+
+enum RollType {
+    Advantage,
+    Disadvantage,
+    Normal,
+}
+
+fn main() {
+    let mut buf = String::new();
+    let io = std::io::stdin();
+    println!("What do you need to throw?");
+    io.read_line(&mut buf).unwrap();
+    let mut dice_params: Vec<i32>;
+    assert_eq!(2, dice_params.len());
+    assert!(dice_params[0] > 0 && dice_params[1] > 2);
+
+}
