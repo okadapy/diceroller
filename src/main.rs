@@ -58,11 +58,11 @@ impl Dice {
     }
 
     fn roll(&self) -> RollResult {
-        return match self.roll_type {
+        match self.roll_type {
             RollType::Advantage => self.roll_advantage(true),
             RollType::Disadvantage => self.roll_advantage(false),
             RollType::Normal => self.roll_normal(),
-        };
+        }
     }
 
     fn roll_normal(&self) -> RollResult {
@@ -70,7 +70,7 @@ impl Dice {
         let mut value = 0;
         for _ in 1..=self.rolls {
             let roll = rand::thread_rng().gen_range(1..=self.sides);
-            value = value + roll;
+            value += roll;
             values_vec.push(roll);
         }
         RollResult::Normal(Roll { value })
