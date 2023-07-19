@@ -77,8 +77,8 @@ impl Dice {
     }
 
     fn roll_advantage(&self, advantage: bool) -> RollResult {
-        let v1: Roll = self.roll_normal().into();
-        let v2: Roll = self.roll_normal().into();
+        let v1: Roll = self.roll_normal().try_into_normal().unwrap();
+        let v2: Roll = self.roll_normal().try_into_normal().unwrap();
         let res: RollAdvantage = match advantage {
             false => {
                 if v1.value > v2.value {
