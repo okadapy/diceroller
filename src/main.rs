@@ -13,20 +13,20 @@ enum RollResult {
     Normal(Roll),
 }
 
-impl Into<Roll> for RollResult {
-    fn into(self) -> Roll {
-        match self {
-            RollResult::Normal(v) => v,
-            _ => panic!("Wrong type of Roll!"),
+impl RollResult {
+    fn try_into_advantage(self) -> Result<RollAdvantage, Self> {
+        if let Self::Advantage(v) = self {
+            Ok(v)
+        } else {
+            Err(self)
         }
     }
-}
 
-impl Into<RollAdvantage> for RollResult {
-    fn into(self) -> RollAdvantage {
-        match self {
-            RollResult::Advantage(v) => v,
-            _ => panic!("Wrong type of Roll!"),
+    fn try_into_normal(self) -> Result<Roll, Self> {
+        if let Self::Normal(v) = self {
+            Ok(v)
+        } else {
+            Err(self)
         }
     }
 }
@@ -121,7 +121,7 @@ mod tests {
             for rolls in 1..=10 {
                 for _i in 0..=5000 {
                     let dice: Dice = Dice::new(rolls, sides, RollType::Normal);
-                    let roll: Roll = dice.roll().into();
+                    let roll: Roll = dice.roll().try_into_normal().unwrap();
                     assert!(
                         roll.value >= 1 && roll.value <= rolls * sides,
                         "rolls = {}, sides = {}; rolls*sides = {}",
@@ -142,7 +142,7 @@ mod tests {
                 for rolls in 1..=10 {
                     for _i in 0..=5000 {
                         let dice: Dice = Dice::new(rolls, sides, roll_type);
-                        let roll: RollAdvantage = dice.roll().into();
+                        let roll: RollAdvantage = dice.roll().try_into_advantage().unwrap();
                         match roll_type {
                             RollType::Advantage => assert!(
                                 roll.result.value >= roll.other.value,
