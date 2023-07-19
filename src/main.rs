@@ -1,6 +1,5 @@
 use rand::Rng;
 #[allow(dead_code)]
-
 #[derive(Copy, Clone, Debug)]
 enum RollType {
     Advantage,
@@ -68,15 +67,13 @@ impl Dice {
 
     fn roll_normal(&self) -> RollResult {
         let mut values_vec: Vec<i32> = vec![];
-        let mut  value = 0;
+        let mut value = 0;
         for _ in 1..=self.rolls {
             let roll = rand::thread_rng().gen_range(1..=self.sides);
             value = value + roll;
             values_vec.push(roll);
         }
-        RollResult::Normal(Roll {
-            value
-        })
+        RollResult::Normal(Roll { value })
     }
 
     fn roll_advantage(&self, advantage: bool) -> RollResult {
@@ -113,5 +110,59 @@ impl Dice {
         RollResult::Advantage(res)
     }
 }
-fn main() {
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn normal_roll_range_test() {
+        for sides in 2..=20 {
+            for rolls in 1..=10 {
+                for i in 0..=5000 {
+                    let dice: Dice = Dice::new(rolls, sides, RollType::Normal);
+                    let roll: Roll = dice.roll().into();
+                    assert!(
+                        roll.value >= 1 && roll.value <= rolls * sides,
+                        "rolls = {}, sides = {}; rolls*sides = {}",
+                        rolls,
+                        sides,
+                        rolls * sides
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn advantage_roll_value_test() {
+        let roll_types_vec: Vec<RollType> = vec![RollType::Advantage, RollType::Disadvantage];
+        for roll_type in roll_types_vec {
+            for sides in 2..=20 {
+                for rolls in 1..=10 {
+                    for i in 0..=5000 {
+                        let dice: Dice = Dice::new(rolls, sides, roll_type);
+                        let roll: RollAdvantage = dice.roll().into();
+                        match roll_type {
+                            RollType::Advantage => assert!(
+                                roll.result.value >= roll.other.value,
+                                "Result = {}, Other = {}",
+                                roll.result.value,
+                                roll.other.value
+                            ),
+                            RollType::Disadvantage => assert!(
+                                roll.result.value <= roll.other.value,
+                                "Result = {}, Other = {}",
+                                roll.result.value,
+                                roll.other.value
+                            ),
+                            _ => panic!("Bad test configuration!"),
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
+
+fn main() {}
